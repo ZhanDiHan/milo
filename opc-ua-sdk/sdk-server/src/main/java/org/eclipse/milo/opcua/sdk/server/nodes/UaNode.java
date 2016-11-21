@@ -69,9 +69,9 @@ public abstract class UaNode implements ServerNode {
     private volatile NodeClass nodeClass;
     private volatile QualifiedName browseName;
     private volatile LocalizedText displayName;
-    private volatile Optional<LocalizedText> description;
-    private volatile Optional<UInteger> writeMask;
-    private volatile Optional<UInteger> userWriteMask;
+    private volatile LocalizedText description;
+    private volatile UInteger writeMask;
+    private volatile UInteger userWriteMask;
 
     protected UaNode(
         UaNodeManager nodeManager,
@@ -81,7 +81,7 @@ public abstract class UaNode implements ServerNode {
         LocalizedText displayName) {
 
         this(nodeManager, nodeId, nodeClass, browseName,
-            displayName, Optional.empty(), Optional.empty(), Optional.empty());
+            displayName, LocalizedText.NULL_VALUE, UInteger.MIN, UInteger.MIN);
     }
 
     protected UaNode(
@@ -90,9 +90,9 @@ public abstract class UaNode implements ServerNode {
         NodeClass nodeClass,
         QualifiedName browseName,
         LocalizedText displayName,
-        Optional<LocalizedText> description,
-        Optional<UInteger> writeMask,
-        Optional<UInteger> userWriteMask) {
+        LocalizedText description,
+        UInteger writeMask,
+        UInteger userWriteMask) {
 
         this.nodeManager = nodeManager;
 
@@ -126,17 +126,17 @@ public abstract class UaNode implements ServerNode {
     }
 
     @Override
-    public Optional<LocalizedText> getDescription() {
+    public LocalizedText getDescription() {
         return description;
     }
 
     @Override
-    public Optional<UInteger> getWriteMask() {
+    public UInteger getWriteMask() {
         return writeMask;
     }
 
     @Override
-    public Optional<UInteger> getUserWriteMask() {
+    public UInteger getUserWriteMask() {
         return userWriteMask;
     }
 
@@ -169,24 +169,24 @@ public abstract class UaNode implements ServerNode {
     }
 
     @Override
-    public synchronized void setDescription(Optional<LocalizedText> description) {
+    public synchronized void setDescription(LocalizedText description) {
         this.description = description;
 
-        description.ifPresent(v -> fireAttributeChanged(AttributeId.Description, v));
+        fireAttributeChanged(AttributeId.Description, description);
     }
 
     @Override
-    public synchronized void setWriteMask(Optional<UInteger> writeMask) {
+    public synchronized void setWriteMask(UInteger writeMask) {
         this.writeMask = writeMask;
 
-        writeMask.ifPresent(v -> fireAttributeChanged(AttributeId.WriteMask, v));
+        fireAttributeChanged(AttributeId.WriteMask, writeMask);
     }
 
     @Override
-    public synchronized void setUserWriteMask(Optional<UInteger> userWriteMask) {
+    public synchronized void setUserWriteMask(UInteger userWriteMask) {
         this.userWriteMask = userWriteMask;
 
-        userWriteMask.ifPresent(v -> fireAttributeChanged(AttributeId.UserWriteMask, v));
+        fireAttributeChanged(AttributeId.UserWriteMask, userWriteMask);
     }
 
     public UaNodeManager getNodeManager() {
