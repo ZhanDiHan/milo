@@ -143,7 +143,7 @@ public class TestNamespace implements Namespace {
             if (node != null) {
                 DataValue value = node.readAttribute(
                     new AttributeContext(context),
-                    id.getAttributeId().intValue(),
+                    id.getAttributeId(),
                     timestamps,
                     id.getIndexRange()
                 );
@@ -175,9 +175,10 @@ public class TestNamespace implements Namespace {
 
                 node.writeAttribute(
                     new AttributeContext(context),
-                    writeValue.getAttributeId().intValue(),
+                    writeValue.getAttributeId(),
                     writeValue.getValue(),
-                    writeValue.getIndexRange());
+                    writeValue.getIndexRange()
+                );
 
                 if (logger.isTraceEnabled()) {
                     Variant variant = writeValue.getValue().getValue();

@@ -509,7 +509,7 @@ public class ExampleNamespace implements Namespace {
             if (node != null) {
                 DataValue value = node.readAttribute(
                     new AttributeContext(context),
-                    readValueId.getAttributeId().intValue(),
+                    readValueId.getAttributeId(),
                     timestamps,
                     readValueId.getIndexRange()
                 );
