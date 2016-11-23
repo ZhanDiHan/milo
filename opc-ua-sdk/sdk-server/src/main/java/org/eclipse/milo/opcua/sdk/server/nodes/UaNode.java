@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.milo.opcua.sdk.core.Reference;
 import org.eclipse.milo.opcua.sdk.core.model.Property;
-import org.eclipse.milo.opcua.sdk.server.api.UaNodeManager;
+import org.eclipse.milo.opcua.sdk.server.api.ServerNodeMap;
 import org.eclipse.milo.opcua.sdk.server.api.nodes.Node;
 import org.eclipse.milo.opcua.sdk.server.api.nodes.ObjectNode;
 import org.eclipse.milo.opcua.sdk.server.api.nodes.VariableNode;
@@ -63,7 +63,7 @@ public abstract class UaNode implements ServerNode {
 
     private List<WeakReference<AttributeObserver>> observers;
 
-    private final UaNodeManager nodeManager;
+    private final ServerNodeMap nodeMap;
 
     private volatile NodeId nodeId;
     private volatile NodeClass nodeClass;
@@ -74,18 +74,18 @@ public abstract class UaNode implements ServerNode {
     private volatile UInteger userWriteMask;
 
     protected UaNode(
-        UaNodeManager nodeManager,
+        ServerNodeMap nodeMap,
         NodeId nodeId,
         NodeClass nodeClass,
         QualifiedName browseName,
         LocalizedText displayName) {
 
-        this(nodeManager, nodeId, nodeClass, browseName,
+        this(nodeMap, nodeId, nodeClass, browseName,
             displayName, LocalizedText.NULL_VALUE, UInteger.MIN, UInteger.MIN);
     }
 
     protected UaNode(
-        UaNodeManager nodeManager,
+        ServerNodeMap nodeMap,
         NodeId nodeId,
         NodeClass nodeClass,
         QualifiedName browseName,
@@ -94,7 +94,7 @@ public abstract class UaNode implements ServerNode {
         UInteger writeMask,
         UInteger userWriteMask) {
 
-        this.nodeManager = nodeManager;
+        this.nodeMap = nodeMap;
 
         this.nodeId = nodeId;
         this.nodeClass = nodeClass;
@@ -189,16 +189,16 @@ public abstract class UaNode implements ServerNode {
         fireAttributeChanged(AttributeId.UserWriteMask, userWriteMask);
     }
 
-    public UaNodeManager getNodeManager() {
-        return nodeManager;
+    public ServerNodeMap getNodeMap() {
+        return nodeMap;
     }
 
     protected Optional<UaNode> getNode(NodeId nodeId) {
-        return nodeManager.getNode(nodeId);
+        return nodeMap.getNode(nodeId);
     }
 
     protected Optional<UaNode> getNode(ExpandedNodeId nodeId) {
-        return nodeManager.getNode(nodeId);
+        return nodeMap.getNode(nodeId);
     }
 
     public ImmutableList<Reference> getReferences() {
@@ -213,7 +213,7 @@ public abstract class UaNode implements ServerNode {
             LOGGER.trace("{} refCount={}", getNodeId(), count);
 
             if (count == 1) {
-                nodeManager.addNode(this);
+                nodeMap.addNode(this);
             }
         }
     }
@@ -258,7 +258,7 @@ public abstract class UaNode implements ServerNode {
             node.removeReferences(inverseReferences);
         }
 
-        nodeManager.removeNode(getNodeId());
+        nodeMap.removeNode(getNodeId());
     }
 
     public <T> Optional<T> getProperty(Property<T> property) {
@@ -289,7 +289,7 @@ public abstract class UaNode implements ServerNode {
             );
 
             UaPropertyNode propertyNode = new UaPropertyNode(
-                getNodeManager(),
+                getNodeMap(),
                 propertyNodeId,
                 browseName,
                 LocalizedText.english(browseName.getName())
